@@ -3,10 +3,13 @@
 
 {% block content %}
     <ul class="fa-list-ul">
-        {% for store in stores %}
-            <li class="list-group">{{ store }}</li>
+        {% for store in queryset %}
+            <li class="list-group">{{ forloop.counter }}{{ store }}</li>
 
         {% endfor %}
 
     </ul>
+    <p>{{ first_store.name }}</p>
+    <p>{{ first_store.city }}</p>
+    <p>{{ first_store.address }}</p>
 {% endblock %}

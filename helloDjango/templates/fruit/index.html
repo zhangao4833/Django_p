@@ -1,8 +1,16 @@
 {% extends 'fruit/base.html' %}
+{% load static %}
 {% block title %}
     水果商店
 {% endblock %}
-
+{% block styles %}
+    <style type="text/css">
+    img{
+        width: 300px;
+        height: 200px !important;
+    }
+    </style>
+{% endblock %}
 {% block content %}
     <nav class="navbar narbar-default ">
         <div class="container-fluid">
@@ -27,16 +35,16 @@
             <div class="col-md-6">
                 <div class="row">
 
-                {% for f in result %}
+                {% for d in data %}
 
 
                         <div class="col-sm-6 col-md-4">
                             <div class="thumbnail">
-{#                                <img src="img/{{ d.img.url }}" alt="">#}
+                                <img src="{{ MEDIA }}{% if d.img.url %}{{ d.img.url }}{% else %}default.jpg{% endif %}" alt="">
                                 <div class="caption">
-                                    <h3>{{ f.name }}</h3>
-                                    <p>原产地：{{ f.source }}</p>
-                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ f.price }}</a> <a href="#"
+                                    <h3>{{ d.fruit.name }}</h3>
+                                    <p>原产地：{{ d.fruit.source }}</p>
+                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ d.fruit.price }}</a> <a href="#"
                                                                                                    class="btn btn-default"
                                                                                                    role="button">购买</a>
                                     </p>

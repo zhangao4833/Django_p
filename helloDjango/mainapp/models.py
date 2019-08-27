@@ -35,35 +35,6 @@ class CateTypeEntity(models.Model):
         verbose_name_plural = verbose_name
 
 
-class FruitEntity(models.Model):
-    name = models.CharField(max_length=20, verbose_name='水果名')
-    price = models.FloatField(verbose_name='价格')
-    source = models.CharField(max_length=30, verbose_name='原产地')
-    category = models.ForeignKey(CateTypeEntity, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 't_fruit'
-        verbose_name = '水果表'
-        verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.name
-
-
-class FruitImageEntty(models.Model):
-    fruit_id = models.ForeignKey(FruitEntity, on_delete=models.CASCADE)
-    url = models.ImageField(max_length=50, verbose_name='地址')
-    name = models.CharField(max_length=100, verbose_name='名称')
-
-    class Meta:
-        db_table = 't_fruit_image'
-        verbose_name = '水果图片'
-        verbose_name_plural = verbose_name
-
-    def __str__(self):
-        return self.name
-
-
 class StoreEntity(models.Model):
     # 默认情况下，模型自创建主键id字段--隐式
     # 但是也可以显式的方式声明主键（primary_key）
@@ -103,11 +74,6 @@ class StoreEntity(models.Model):
         return self.name
 
     # 调用模型保存方法时调用
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        if not self.id:
-            self.id = uuid.uuid4().hex
-        super().save()
 
     @property
     def id_(self):
@@ -117,3 +83,38 @@ class StoreEntity(models.Model):
     def open_time(self):
         print(self.create_time)
         return self.create_time
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if not self.id:
+            self.id = uuid.uuid4().hex
+        super().save()
+class FruitEntity(models.Model):
+    name = models.CharField(max_length=20, verbose_name='水果名')
+    price = models.FloatField(verbose_name='价格')
+    source = models.CharField(max_length=30, verbose_name='原产地')
+    category = models.ForeignKey(CateTypeEntity, on_delete=models.CASCADE)
+    store_id = models.ForeignKey(StoreEntity, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 't_fruit'
+        verbose_name = '水果表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class FruitImageEntty(models.Model):
+    fruit_id = models.ForeignKey(FruitEntity, on_delete=models.CASCADE)
+    url = models.ImageField(upload_to='fruit', width_field='width', height_field='height', verbose_name='图片地址')
+    width = models.IntegerField(verbose_name='宽')
+    height = models.IntegerField(verbose_name='高')
+    name = models.CharField(max_length=100, verbose_name='名称')
+
+    class Meta:
+        db_table = 't_fruit_image'
+        verbose_name = '水果图片'
+        verbose_name_plural = verbose_name
+    #
+    # def __str__(self):
+    #     return self.fruit_id

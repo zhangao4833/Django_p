@@ -52,7 +52,9 @@ class StoreAdmin(object):
 
 
 class FruitImageAdmin(object):
+    # readonly_fields = ('fruit_id',)
     list_display = ('id', 'fruit_id', 'url', 'name')
+    fields = ('fruit_id','url')
 
 
 xadmin.site.register(UserEntity, UserAdmin)
