@@ -1,0 +1,12 @@
+{% extends 'fruit/base.html' %}
+
+
+{% block content %}
+    <ul class="fa-list-ul">
+        {% for store in stores %}
+            <li class="list-group">{{ store }}</li>
+
+        {% endfor %}
+
+    </ul>
+{% endblock %}
