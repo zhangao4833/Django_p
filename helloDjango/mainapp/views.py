@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from django.db.models import Count, Sum, Min, Max, Avg, F
+from django.db.models import Count, Sum, Min, Max, Avg, F, Q
 from mainapp.models import UserEntity, FruitEntity, FruitImageEntty, StoreEntity
 from django.conf import settings
 
@@ -160,8 +160,21 @@ def count_fruit(request):
     }
     for r in result:
         data['data'].append(r)
-    FruitEntity.objects.filter(id=10).update(price=F('price')+1)
-    return JsonResponse(data)
+
+    # 查询水果价格低于3 或高于10 的，或原产地是西安且名称中包含“果”字
+
+    # fruit2 = FruitEntity.objects.filter(Q(price__lte=3)|Q(price__gte=10)|Q(Q(source='西安')&Q(name__contains='果'))).values()
+    # FruitEntity.objects.update(price=F('price')*0.88)
+
+    fruit2 = FruitEntity.objects.raw('''select * from t_fruit''')
+    print(fruit2, type(fruit2))
+    for f in fruit2:
+        print(f, type(f))
+    data2 = {
+        'fruit':[f for f in fruit2]
+    }
+
+    return JsonResponse(data2)
 
 
 def delete_fruit(request):

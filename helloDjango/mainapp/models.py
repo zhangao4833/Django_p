@@ -83,11 +83,14 @@ class StoreEntity(models.Model):
     def open_time(self):
         print(self.create_time)
         return self.create_time
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if not self.id:
             self.id = uuid.uuid4().hex
         super().save()
+
+
 class FruitEntity(models.Model):
     name = models.CharField(max_length=20, verbose_name='水果名')
     price = models.FloatField(verbose_name='价格')
@@ -118,3 +121,58 @@ class FruitImageEntty(models.Model):
     #
     # def __str__(self):
     #     return self.fruit_id
+
+
+class RealProfile(models.Model):
+    # 声明一对一的关联关系
+    user = models.OneToOneField(UserEntity, on_delete=models.CASCADE, verbose_name='登陆用户')
+    real_name = models.CharField(max_length=20, verbose_name='真实姓名')
+    number = models.CharField(max_length=30, verbose_name='证件号')
+    real_type = models.IntegerField(choices=((0, '身份证'), (1, '护照'), (2, '驾驶证')), verbose_name='证件类型')
+
+    image1 = models.ImageField(verbose_name='证件正面照', upload_to='user/real')
+    image2 = models.ImageField(verbose_name='证件反面照', upload_to='user/real')
+
+    class Meta:
+        db_table = 't_user_profile'
+        verbose_name_plural = verbose_name = '实名认证表'
+
+    def __str__(self):
+        return self.real_name
+
+
+# 购物车
+class CartEntity(models.Model):
+    class Meta:
+        db_table = 't_cart'
+        verbose_name_plural = verbose_name = '购物车表'
+
+    user = models.OneToOneField(UserEntity, on_delete=models.CASCADE, verbose_name='账号')
+    no = models.CharField(primary_key=True, max_length=10, verbose_name='购物车编号')
+
+    def __str__(self):
+        return self.no
+
+
+# 声明水果商品于购物车的关系表
+class FruitCartEntity(models.Model):
+    cart = models.ForeignKey(CartEntity, on_delete=models.CASCADE, verbose_name='购物车')
+    fruits = models.ForeignKey(FruitEntity, on_delete=models.CASCADE, verbose_name='水果')
+    cnt = models.IntegerField(verbose_name='数量')
+
+    @property
+    def price(self):
+        # 属性方法在后台显示时没有verbose_name, 如何解决？
+        return round(self.cnt * self.fruits.price, 2)
+
+    @property
+    def price1(self):
+        # 属性方法在后台显示时没有verbose_name, 如何解决？
+        return self.fruits.price  # 从获取主的属性
+
+    class Meta:
+        db_table = 't_fruit_cart'
+        verbose_name_plural = verbose_name = '购物车详情表'
+
+    def __str__(self):
+        return self.fruits.name + '：' + self.cart.no
