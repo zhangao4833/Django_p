@@ -1,6 +1,6 @@
 from django.urls import path
 from mainapp.views import user_list, user_list2, add_user, user_update, user_delete, get_fruit_all, find_fruit, \
-    find_store, all_store, count_fruit, delete_fruit
+    find_store, all_store, count_fruit, delete_fruit, user_login
 
 urlpatterns = [
     path('list/', user_list),
@@ -14,4 +14,5 @@ urlpatterns = [
     path('store_all/', all_store),
     path('count/', count_fruit),
     path('fruit_del/', delete_fruit),
+    path('login/', user_login),
 ]

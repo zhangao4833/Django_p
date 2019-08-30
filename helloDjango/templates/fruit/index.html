@@ -5,9 +5,12 @@
 {% endblock %}
 {% block styles %}
     <style type="text/css">
-    img{
-        width: 300px;
-        height: 200px !important;
+        img {
+            width: 300px;
+            height: 200px !important;
+        }
+    .active{
+        background-color: linen;
     }
     </style>
 {% endblock %}
@@ -16,64 +19,107 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <ul class="nav navbar-nav">
-                    <li><a href="#">水果列表</a></li>
+                    <li><a {% if cate == None %}class="active"{% endif %} href="/user/find/">全部水果</a></li>
+                    {% for menu in menus %}
+                        <li><a class="{% if forloop.counter|safe == cate %}active{% endif %}" href="/user/find/?cate={{ forloop.counter }}">{{ menu.name }}</a></li>
+                    {% endfor %}
+
+
                 </ul>
+
             </div>
+            <ul class="nav navbar-nav navbar-right">
+                {% if login_status == None %}
+                    <li><a style="cursor: pointer" data-toggle="modal" data-target="#login">登陆</a></li>
+                    <li><a href="#">注册</a></li>
+                {% else %}
+                    <li><span style="font-size: 30px" class="label label-default">你好,{{ login_u.name }}</span></li>
+                {% endif %}
+            </ul>
         </div>
     </nav>
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3">
-                <div class="row">
-                    <form method="get">
-                        <input type="text" class="form-control" name="price1" value="{% if price1 %}{{ price1 }}{% else %}0{% endif %}">
-                        <input type="text" class="form-control" name="price2" value="{% if price1 %}{{ price2 }}{% else %}1000{% endif %}">
-                        <button type="submit" class="btn btn-default">搜索</button>
-                    </form>
-                </div>
+                {#                <div class="row">#}
+                {#                    <form method="get">#}
+                {#                        <input type="text" class="form-control" name="price1" value="{% if price1 %}{{ price1 }}{% else %}0{% endif %}">#}
+                {#                        <input type="text" class="form-control" name="price2" value="{% if price1 %}{{ price2 }}{% else %}1000{% endif %}">#}
+                {#                        <button type="submit" class="btn btn-default">搜索</button>#}
+                {#                    </form>#}
+                {#                </div>#}
+                {% if login_status != None %}
+                    {% include 'fruit/collect.html' %}
+                  {% if not login_coll %}
+                        <p>当前用户还没有收藏商品哦！</p>
+
+                    {% endif %}
+                {% endif %}
             </div>
             <div class="col-md-6">
                 <div class="row">
 
-                {% for d in data %}
+                    {% for d in data %}
 
 
                         <div class="col-sm-6 col-md-4">
                             <div class="thumbnail">
-                                <img src="{{ MEDIA }}{% if d.img.url %}{{ d.img.url }}{% else %}default.jpg{% endif %}" alt="">
+                                <img src="
+                                        {{ MEDIA }}{% if d.fruit.img.url %}{{ d.fruit.img.url }}{% else %}default.jpg{% endif %}"
+                                     alt="">
                                 <div class="caption">
                                     <h3>{{ d.fruit.name }}</h3>
                                     <p>原产地：{{ d.fruit.source }}</p>
-                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ d.fruit.price }}</a> <a href="#"
-                                                                                                   class="btn btn-default"
-                                                                                                   role="button">购买</a>
+                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ d.fruit.price }}</a> <a
+                                            href="#"
+                                            class="btn btn-default"
+                                            role="button">购买</a>
                                     </p>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
 
-{#                    {% for d in data %}#}
+                    {#                    {% for d in data %}#}
 
 
-{#                        <div class="col-sm-6 col-md-4">#}
-{#                            <div class="thumbnail">#}
-{#                                <img src="img/{{ d.img.url }}" alt="">#}
-{#                                <div class="caption">#}
-{#                                    <h3>{{ d.fruit.name }}</h3>#}
-{#                                    <p>原产地：{{ d.fruit.source }}</p>#}
-{#                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ d.fruit.price }}</a> <a href="#"#}
-{#                                                                                                   class="btn btn-default"#}
-{#                                                                                                   role="button">购买</a>#}
-{#                                    </p>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    {% endfor %}#}
+                    {#                        <div class="col-sm-6 col-md-4">#}
+                    {#                            <div class="thumbnail">#}
+                    {#                                <img src="img/{{ d.img.url }}" alt="">#}
+                    {#                                <div class="caption">#}
+                    {#                                    <h3>{{ d.fruit.name }}</h3>#}
+                    {#                                    <p>原产地：{{ d.fruit.source }}</p>#}
+                    {#                                    <p><a href="#" class="btn btn-primary" role="button">￥{{ d.fruit.price }}</a> <a href="#"#}
+                    {#                                                                                                   class="btn btn-default"#}
+                    {#                                                                                                   role="button">购买</a>#}
+                    {#                                    </p>#}
+                    {#                                </div>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    {% endfor %}#}
 
                 </div>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-md-3">
+                {% if login_status != None %}
+                    {% include 'fruit/cart.html' %}
+                    {% if not login_cart_all %}
+                        <p>当前用户购物车还没有商品！</p>{% endif %}
+                {% endif %}
+
+            </div>
         </div>
     </div>
+    {% if login_status == None %}
+        {% include 'fruit/motai_login.html' %}
+
+    {% endif %}
+
+
+
+    {% if msg %}
+        <script>
+            alert("{{ msg }}")
+        </script>
+    {% endif %}
 {% endblock %}

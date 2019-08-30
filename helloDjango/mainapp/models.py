@@ -7,6 +7,7 @@ from django.db import models
 class UserEntity(models.Model):
     name = models.CharField(max_length=20, verbose_name='账号')
     age = models.IntegerField(default=0, verbose_name='年龄')
+    pwd = models.CharField(max_length=32,verbose_name='密码')
     phone = models.CharField(max_length=11, verbose_name='手机号', blank=True, null=True)
 
     class Meta:
@@ -95,8 +96,14 @@ class FruitEntity(models.Model):
     name = models.CharField(max_length=20, verbose_name='水果名')
     price = models.FloatField(verbose_name='价格')
     source = models.CharField(max_length=30, verbose_name='原产地')
-    category = models.ForeignKey(CateTypeEntity, on_delete=models.CASCADE)
+    category = models.ForeignKey(CateTypeEntity, related_name='fruits', on_delete=models.CASCADE, verbose_name='分类')
     store_id = models.ForeignKey(StoreEntity, on_delete=models.CASCADE)
+
+    # 默认情况下，反向引用的名称是当前类的名称(小写）_ser
+    # 可以通过related_name 来指定
+    # db_table = 't_collect' 使用第三张表的方式建立fruit和user的多对多的关系
+    users = models.ManyToManyField(UserEntity, db_table='t_collect', related_name='fruits', verbose_name='收藏用户列表', blank=True)
+    tags = models.ManyToManyField('TagEntity', verbose_name='标签', db_table='t_fruit_tag',related_name='fruits', blank=True)
 
     class Meta:
         db_table = 't_fruit'
@@ -108,7 +115,7 @@ class FruitEntity(models.Model):
 
 
 class FruitImageEntty(models.Model):
-    fruit_id = models.ForeignKey(FruitEntity, on_delete=models.CASCADE)
+    fruit_id = models.OneToOneField(FruitEntity, on_delete=models.CASCADE, related_name='img')
     url = models.ImageField(upload_to='fruit', width_field='width', height_field='height', verbose_name='图片地址')
     width = models.IntegerField(verbose_name='宽')
     height = models.IntegerField(verbose_name='高')
@@ -139,6 +146,7 @@ class RealProfile(models.Model):
 
     def __str__(self):
         return self.real_name
+
 
 
 # 购物车
@@ -176,3 +184,16 @@ class FruitCartEntity(models.Model):
 
     def __str__(self):
         return self.fruits.name + '：' + self.cart.no
+
+
+class TagEntity(models.Model):
+    class Meta:
+        db_table = 't_tag'
+        verbose_name_plural = verbose_name = '标签表'
+        ordering = ['-order_num']
+
+    name = models.CharField(max_length=20, verbose_name='标签名', unique=True)
+    order_num = models.IntegerField(verbose_name='标签序号', default=0)
+
+    def __str__(self):
+        return self.name
